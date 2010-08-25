@@ -1,0 +1,12 @@
+{application, smpp34kit,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, [smpp34kit_sup, smpp34kit_pdugen, smpp34kit_pdugensession_sup]},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { smpp34kit_app, []}},
+  {env, []}
+ ]}.
