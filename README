@@ -1,0 +1,8 @@
+smpp34kit is supposed to be a collection of tools and application
+to help out a SMPP 3.4 developer.
+
+It is initially starting out as a simple PDU generator over a socket 
+connection to allow me to test my smpp34 erlang implementation properly.
+
+Any other tools will be added here, but there is no overriding rule
+guiding its evolution
