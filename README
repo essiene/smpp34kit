@@ -6,3 +6,54 @@ connection to allow me to test my smpp34 erlang implementation properly.
 
 Any other tools will be added here, but there is no overriding rule
 guiding its evolution
+
+Right now, there is only one tool:
+
+PDU Generator
+=============
+
+This is a pretty dumb tool right now blindly sends a #bind_transceiver_resp{}
+PDU to every connected client repeatedly.
+
+Its only usefull for testing the smpp34 library receiver module.
+
+It will probably morph to become a bit better as I make it usefull for more
+integration testing.
+
+
+Building
+=========
+smpp34kit is rebar'ized ;)
+
+$ rebar clean compile
+
+
+Usage
+=====
+
+First build an initial target system using rebar like so:
+
+$ rebar clean compile generate
+
+Then start the release
+
+$ ./rel/smpp34kit/bin/smpp34kit start
+
+This starts the only tool (Pdu Gen) on port 10001
+
+You can then test it by:
+
+$ telnet localhost 10001
+
+And enjoy the binary dumps that fly by the screen after a few seconds.
+
+
+Future Direction
+================
+
+I have no master plan for this kit and it will evolve (or de-evolve) as the
+need arises. The good thing though is that I have a few funky test scenarios
+in my mind for smpp34 library, which will probably drive these first few weeks.
+
+After that is met though, I dunno, maybe a full SMPP 3.4 server simulator
+(SMSC) ?
