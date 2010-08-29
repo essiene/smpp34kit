@@ -30,7 +30,9 @@ init([Port, Backlog]) ->
      }.
 
 handle_accept(Sock, State) -> 
-    smpp34kit_pdugensession_sup:start_child(Sock),
+	{ok, Session} = smpp34kit_pdugensession_sup:start_child(Sock),
+	gen_tcp:controlling_process(Sock, Session),
+	smpp34kit_pdugensession:beginrx(Session),
     {noreply, State}.
 
 handle_call(Request, _From, State) ->
