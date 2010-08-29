@@ -2,7 +2,7 @@
 -behaviour(gen_fsm).
 -include_lib("smpp34pdu/include/smpp34pdu.hrl").
 
--export([start_link/1]).
+-export([start_link/1, beginrx/1]).
 
 -export([
 		idle/2,
@@ -27,6 +27,9 @@
 start_link(Socket) ->
     error_logger:info_msg("Starting session~n"),
     gen_fsm:start_link(?MODULE, [Socket], []).
+
+beginrx(Pid) ->
+	gen_fsm:send_all_state_event(Pid, beginrx).
 
 
 idle({timeout, Ref, start}, #st{ref=Ref}=St) ->
@@ -58,6 +61,9 @@ init([Socket]) ->
     State = #st{socket=Socket, ref=Ref},
     {ok, idle, State}.
 
+handle_event(beginrx, State, #st{socket=Socket}=St) ->
+	inet:setopts(Socket, [{active, once}]),
+	{next_state, State, St};
 handle_event(_Event, State, St) ->
     {next_state, State, St}.
 
