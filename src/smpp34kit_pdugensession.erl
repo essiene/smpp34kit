@@ -21,7 +21,7 @@
         code_change/4
     ]).
 
--record(st, {socket, ref}).
+-record(st, {socket, ref, data = <<>>}).
 
 
 start_link(Socket) ->
@@ -64,6 +64,18 @@ handle_event(_Event, State, St) ->
 handle_sync_event(Event, _From, State, St) ->
     {reply, {illegal, Event}, State, St}.
 
+handle_info({tcp, Socket, Data}, State, #st{socket=Socket, data=Data0}=St) ->
+	Data1 = <<Data0/binary, Data/binary>>,
+	{_, PduList, Rest} = smpp34pdu:unpack(Data1),
+	log_pdu(PduList),
+	inet:setopts(Socket, [{active, once}]),
+	{next_state, State, St#st{data=Rest}};
+handle_info({tcp_error, Socket, Reason}, _, #st{socket=Socket}=St) ->
+	error_logger:error_msg("Error in connection: {~p, ~p}~n", [Socket, Reason]),
+	{stop, normal, St};
+handle_info({tcp_closed, Socket}, _, #st{socket=Socket}=St) ->
+	error_logger:info_msg("Connection closed by client~n"),
+	{stop, normal, St};
 handle_info(_Info, State, St) ->
     {next_state, State, St}.
 
@@ -73,3 +85,12 @@ terminate(_Reason, _St, #st{socket=Socket}) ->
 
 code_change(_OldVsn, State, St, _Extra) ->
     {next_state, State, St}.
+
+
+log_pdu([]) ->
+	ok;
+log_pdu([Pdu|Rest]) ->
+	log_pdu(Pdu),
+	log_pdu(Rest);
+log_pdu(Pdu) ->
+	error_logger:info_msg("==>~p~n",[Pdu]).
